@@ -19,7 +19,11 @@ module Oahu
   private
 
     def api_path path
-      "/api/v1/clients/#{credentials[:client_id]}/#{path.gsub(/^\//, '')}"
+      if path =~ /^\//
+        path
+      else
+        "/api/v1/clients/#{credentials[:client_id]}/#{path.gsub(/^\//, '')}"
+      end
     end
 
     # Perform an HTTP request

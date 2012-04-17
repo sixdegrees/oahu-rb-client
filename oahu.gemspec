@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'multi_json',            '~> 1.0'
 
   # Development Dependencies
-  # gem.add_development_dependency 'activesupport',         ['>= 2.3.9', '< 4']
+  gem.add_development_dependency 'activesupport',         ['>= 2.3.9', '< 4']
   gem.add_development_dependency 'redis-activesupport', '~> 3.2.3'
 
 

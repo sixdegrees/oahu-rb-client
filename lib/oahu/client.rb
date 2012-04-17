@@ -23,11 +23,17 @@ module Oahu
 
     def credentials
       {
+        :app_id           => app_id,
         :client_id        => client_id,
         :consumer_id      => consumer_id,
         :consumer_secret  => consumer_secret
       }
     end
     
+    def app
+      return unless consumer_id
+      @app ||= get("/app", :app_id => consumer_id)
+    end
+
   end
 end

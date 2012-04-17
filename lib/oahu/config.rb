@@ -14,6 +14,8 @@ module Oahu
     # The client ID if none is set
     DEFAULT_CLIENT_ID = nil
 
+    DEFAULT_APP_ID = nil
+
     # The consumer ID if none is set
     DEFAULT_CONSUMER_ID = nil
 
@@ -40,7 +42,8 @@ module Oahu
     VALID_OPTIONS_KEYS = [
       :adapter,
       :connection_options,
-      :client_id, 
+      :app_id,
+      :client_id,
       :consumer_id,
       :consumer_secret,
       :endpoint,
@@ -49,6 +52,11 @@ module Oahu
     ]
 
     attr_accessor *VALID_OPTIONS_KEYS
+
+
+    def domain= d
+      self.endpoint = "https://#{d}/"
+    end
 
     # When this module is extended, set all configuration options to their default values
     def self.extended(base)
@@ -73,6 +81,7 @@ module Oahu
       self.adapter            = DEFAULT_ADAPTER
       self.connection_options = DEFAULT_CONNECTION_OPTIONS
       self.client_id          = DEFAULT_CLIENT_ID
+      self.app_id             = DEFAULT_APP_ID
       self.consumer_id        = DEFAULT_CONSUMER_ID
       self.consumer_secret    = DEFAULT_CONSUMER_SECRET
       self.endpoint           = DEFAULT_ENDPOINT
