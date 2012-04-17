@@ -53,9 +53,8 @@ module Oahu
 
     attr_accessor *VALID_OPTIONS_KEYS
 
-
-    def domain= d
-      self.endpoint = "https://#{d}/"
+    def domain
+      @domain ||= URI.parse(endpoint).host unless endpoint.nil?
     end
 
     # When this module is extended, set all configuration options to their default values
@@ -78,6 +77,7 @@ module Oahu
 
     # Reset all configuration options to defaults
     def reset
+      @domain                 = nil
       self.adapter            = DEFAULT_ADAPTER
       self.connection_options = DEFAULT_CONNECTION_OPTIONS
       self.client_id          = DEFAULT_CLIENT_ID
