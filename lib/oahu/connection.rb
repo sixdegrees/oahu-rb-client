@@ -19,6 +19,8 @@ module Oahu
         },
         :ssl => {:verify => false},
         :url => options.fetch(:endpoint, endpoint),
+        :timeout => 10,
+        :open_timeout => 10
       }
       @connection ||= Faraday.new(default_options.deep_merge(connection_options)) do |builder|
         builder.use Oahu::Request::Auth, credentials

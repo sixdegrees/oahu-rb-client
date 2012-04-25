@@ -48,7 +48,9 @@ module Oahu
       :consumer_secret,
       :endpoint,
       :user_agent,
-      :cache_store
+      :cache_store,
+      :cloudfront,
+      :cloudfront_bucket
     ]
 
     attr_accessor *VALID_OPTIONS_KEYS
@@ -87,6 +89,8 @@ module Oahu
       self.endpoint           = DEFAULT_ENDPOINT
       self.user_agent         = DEFAULT_USER_AGENT
       self.cache_store        = DEFAULT_CACHE_STORE
+      self.cloudfront          = nil
+      self.cloudfront_bucket   = nil
       self
     end
 
