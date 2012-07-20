@@ -21,6 +21,10 @@ module Oahu
     def respond_to?(method, include_private=false)
       new.respond_to?(method, include_private) || super(method, include_private)
     end
+
+    def log msg, level=:debug
+      Oahu.logger.send(level.to_sym, "[Oahu:#{Oahu.domain}] #{msg}") if Oahu.logger && Oahu.logger.respond_to?(level.to_sym)
+    end
   end
 
 end

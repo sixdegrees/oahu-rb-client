@@ -34,9 +34,12 @@ module Oahu
 
     DEFAULT_CACHE_STORE = nil
 
+    DEFAULT_STORE_ADAPTER = [:memory, {}]
     
     # The value sent in the 'User-Agent' header if none is set
     DEFAULT_USER_AGENT = "Oahu Ruby Gem #{Oahu::VERSION}"
+
+    DEFAULT_LOGGER = nil
 
     # An array of valid keys in the options hash when configuring a {Oahu::Client}
     VALID_OPTIONS_KEYS = [
@@ -49,8 +52,10 @@ module Oahu
       :endpoint,
       :user_agent,
       :cache_store,
+      :store_adapter,
       :cloudfront,
-      :cloudfront_bucket
+      :cloudfront_bucket,
+      :logger
     ]
 
     attr_accessor *VALID_OPTIONS_KEYS
@@ -80,6 +85,7 @@ module Oahu
     # Reset all configuration options to defaults
     def reset
       @domain                 = nil
+      self.logger             = DEFAULT_LOGGER
       self.adapter            = DEFAULT_ADAPTER
       self.connection_options = DEFAULT_CONNECTION_OPTIONS
       self.client_id          = DEFAULT_CLIENT_ID
@@ -89,8 +95,9 @@ module Oahu
       self.endpoint           = DEFAULT_ENDPOINT
       self.user_agent         = DEFAULT_USER_AGENT
       self.cache_store        = DEFAULT_CACHE_STORE
-      self.cloudfront          = nil
-      self.cloudfront_bucket   = nil
+      self.store_adapter      = DEFAULT_STORE_ADAPTER
+      self.cloudfront         = nil
+      self.cloudfront_bucket  = nil
       self
     end
 

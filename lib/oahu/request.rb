@@ -27,7 +27,8 @@ module Oahu
     end
 
     # Perform an HTTP request
-    def request(method, path, params, options)
+    def request(method, path, params={}, options)
+      Oahu.log("#{method.upcase} #{path} - params: #{params.to_json}")
       response = connection(options).run_request(method, nil, nil, nil) do |request|
         # request.options[:phoenix] = true if options[:phoenix]
         request.options[:raw] = true if options[:raw]

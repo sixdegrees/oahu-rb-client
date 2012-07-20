@@ -27,6 +27,7 @@ module Oahu
         builder.use Faraday::Request::UrlEncoded 
         builder.use FaradayMiddleware::Caching, cache_store unless cache_store.nil?
         builder.use FaradayMiddleware::ParseJson
+        builder.use Faraday::Response::RaiseError
         builder.adapter(adapter)
       end
     end

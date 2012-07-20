@@ -19,10 +19,10 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'faraday',               '~> 0.7'
   gem.add_dependency 'faraday_middleware',    '~> 0.7'
   gem.add_dependency 'multi_json',            '~> 1.0'
+  gem.add_dependency 'toystore',  ['>= 0.10', '< 1']
 
   # Development Dependencies
-  gem.add_development_dependency 'activesupport',         ['>= 2.3.9', '< 4']
-  gem.add_development_dependency 'redis-activesupport', '~> 3.2.3'
-
+  gem.add_development_dependency 'activesupport',       ['>= 2.3.9', '< 4']
+  gem.add_development_dependency 'redis-activesupport'
 
 end
