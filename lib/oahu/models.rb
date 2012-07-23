@@ -27,6 +27,7 @@ module Oahu
 
     attribute :id,                String
     attribute :_type,             String
+    attribute :slug,              String
     attribute :tags,              Array
     attribute :published,         Boolean
     attribute :name,              String
