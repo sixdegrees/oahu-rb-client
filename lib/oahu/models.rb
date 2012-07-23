@@ -102,6 +102,7 @@ module Oahu
 
     attribute :idx,   Hash
     attribute :klass_name, String
+    attribute :_type, String, :default => "Oahu::Index"
 
     def klass
       klass_name.constantize
