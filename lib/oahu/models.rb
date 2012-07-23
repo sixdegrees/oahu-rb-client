@@ -148,7 +148,7 @@ module Oahu
       __rev = ["updated_at"]
       project_ids.map do |i| 
         p = Project.find(i)
-        __rev << p
+        __rev << p.rev unless p.nil?
       end
       self._rev = Digest::MD5.hexdigest(__rev.flatten.join("-"))
       save
@@ -246,10 +246,10 @@ module Oahu
 
     def self.sync(filters={ :published => true })
       Oahu.log("Projects Sync start")
-      Oahu.get("projects", :filters => filters).map { |attrs| create(attrs) }
-     end
+      Oahu.get("projects", :filters => filters).map { |attrs| create(attrs).sync }
+    end
 
-    after_create :sync
+    # after_create :sync
 
     def sync
       __rev = [updated_at]
