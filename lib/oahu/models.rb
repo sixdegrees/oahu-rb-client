@@ -174,8 +174,9 @@ module Oahu
 
   class Resource < Model
     attribute :project_id, String
-    def self.path
-      "projects/#{project_id}/#{id}"
+    
+    def self.path id
+      "projects/#{project_id}"
     end
 
     def project
@@ -246,7 +247,7 @@ module Oahu
 
     def self.sync(filters={ :published => true })
       Oahu.log("Projects Sync start")
-      Oahu.get("projects", :filters => filters).map { |attrs| create(attrs).sync }
+      Oahu.get("projects", filters: filters, limit: 0).map { |attrs| create(attrs).sync }
     end
 
     # after_create :sync
@@ -264,7 +265,7 @@ module Oahu
     def sync_list(what)
       rev = [what.to_s]
       Oahu.log("Project #{what} Sync start [#{id}]", :debug)
-      Oahu.get("projects/#{id}/#{what}", limit: 0, filters:{published:true}).map do |attrs|
+      Oahu.get("projects/#{id}/#{what}", limit: 0).map do |attrs|
         klass = "Oahu::#{attrs["_type"]}".constantize rescue nil
         klass = Oahu.const_get(what.to_s.singularize.camelize) unless klass.respond_to? :create
         list_name = klass.name.demodulize.pluralize.underscore.to_sym
