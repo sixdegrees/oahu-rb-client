@@ -165,6 +165,7 @@ module Oahu
   end
 
   class App < Model
+    attribute :homepage, String
     attribute :project_id, String    
   end
 
