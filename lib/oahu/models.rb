@@ -49,7 +49,7 @@ module Oahu
     end
 
     def self.path id
-      "#{self.class.name.pluralize.underscore}/#{id}"
+      "#{self.name.pluralize.underscore}/#{id}"
     end
 
     def self.all
