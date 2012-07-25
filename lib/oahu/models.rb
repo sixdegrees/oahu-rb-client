@@ -165,8 +165,21 @@ module Oahu
   end
 
   class App < Model
+
     attribute :homepage, String
     attribute :project_id, String    
+
+    def self.live
+      self.all.select { |a| a.live? }
+    end
+
+    def live?
+      return false unless starts_at
+      return false if starts_at > Time.now
+      return false if ends_at && ends_at < Time.now
+      true
+    end
+
   end
 
   class PubAccount < Model
@@ -196,6 +209,7 @@ module Oahu
 
     class Video < Resource
       attribute :paths, Hash
+      attribute :encoding, String
     end
 
     class ImageList < ResourceList
@@ -208,7 +222,7 @@ module Oahu
     class VideoList < ResourceList
       attribute :video_ids, Array
       def videos
-        video_ids.map { |i| Video.get(i) }.compact
+        video_ids.map { |i| v = Video.get(i); v unless v.encoding != "finished" }.compact
       end
     end
   end
