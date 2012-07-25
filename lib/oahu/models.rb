@@ -36,7 +36,8 @@ module Oahu
     attribute :updated_at,        Time
     attribute :likes,             Integer
     attribute :stats,             Hash
-   
+    attribute :url,               String
+
     after_save do
       _keys = [Oahu::Index::ALL_KEY]
       _keys.concat(self.class.index_keys.map { |k| [k, self.send(k.to_sym).to_s].join(":") if self.respond_to?(k.to_sym) } ) if self.class.respond_to?(:index_keys)
@@ -166,10 +167,14 @@ module Oahu
 
   class App < Model
 
-    attribute :homepage,  String
-    attribute :project_id,  String
-    attribute :starts_at,   Time
-    attribute :ends_at,   Time
+    attribute :homepage,        String
+    attribute :project_id,      String
+    attribute :starts_at,       Time
+    attribute :ends_at,         Time
+    attribute :stylesheet_url,  String
+    attribute :callback_url,    String
+    attribute :extra,           Hash
+    attribute :players_count,   Integer
 
     def self.live
       self.all.select { |a| a.live? }
