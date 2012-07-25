@@ -252,12 +252,12 @@ module Oahu
     attribute :links,             Array
     attribute :credits,           Array
 
+    list :pub_accounts,           Oahu::PubAccount
     list :images,                 Oahu::Resources::Image
     list :videos,                 Oahu::Resources::Video
     list :video_lists,            Oahu::Resources::VideoList
     list :image_lists,            Oahu::Resources::ImageList
     list :apps,                   Oahu::App
-    list :pub_accounts,           Oahu::PubAccount
 
     def self.index_keys
       [:slug]
@@ -298,6 +298,7 @@ module Oahu
  
     def sync_list(what)
       rev = [what.to_s]
+      _lists = {}
       Oahu.log("Project #{what} Sync start [#{id}]", :debug)
       Oahu.get("projects/#{id}/#{what}", limit: 0).map do |attrs|
         klass = "Oahu::#{attrs["_type"]}".constantize rescue nil
@@ -305,10 +306,12 @@ module Oahu
         list_name = klass.name.demodulize.pluralize.underscore.to_sym
         if respond_to?(list_name)
           o = klass.create(attrs)
-          send(list_name).send :<<, o
+          _lists[list_name] ||= []
+          _lists[list_name] << o
           rev << o.rev
         end
       end
+      _lists.map { |ln,ll| send("#{ln}=", ll) }
       Digest::MD5.hexdigest rev.sort.join("-")
     end
 
