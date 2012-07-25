@@ -267,6 +267,18 @@ module Oahu
       "projects/#{id}"
     end
 
+    def self.all_by_year
+      all.inject({}) do |pp, p|
+        if p.release_date
+          if year = p.release_date.year
+            pp[year] ||= []
+            pp[year] << p
+          end
+        end
+        pp
+      end
+    end
+
     def self.sync(filters={ :published => true })
       Oahu.log("Projects Sync start")
       Oahu.get("projects", filters: filters, limit: 0).map { |attrs| create(attrs).sync }
@@ -298,6 +310,22 @@ module Oahu
         end
       end
       Digest::MD5.hexdigest rev.sort.join("-")
+    end
+
+    def default_video
+      Oahu::Resources::Video.get(default_video_id) unless default_video_id.nil?
+    end
+
+    def default_image
+      Oahu::Resources::Image.get(default_image_id) unless default_image_id.nil?
+    end
+
+    def credits_by_job(job)
+      (credits || []).select { |c| c['job']  == job }.map { |c| c['name'] }
+    end
+
+    def self.by_slug slug
+      find_by(:slug, slug)
     end
 
   end
