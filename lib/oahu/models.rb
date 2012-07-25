@@ -166,8 +166,10 @@ module Oahu
 
   class App < Model
 
-    attribute :homepage, String
-    attribute :project_id, String    
+    attribute :homepage,  String
+    attribute :project_id,  String
+    attribute :starts_at,   Time
+    attribute :ends_at,   Time
 
     def self.live
       self.all.select { |a| a.live? }
