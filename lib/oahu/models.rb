@@ -26,6 +26,7 @@ module Oahu
     include Oahu::Store
 
     attribute :id,                String
+    attribute :_rev,              String
     attribute :_type,             String
     attribute :slug,              String
     attribute :tags,              Array
@@ -37,6 +38,12 @@ module Oahu
     attribute :likes,             Integer
     attribute :stats,             Hash
     attribute :url,               String
+
+    before_save do
+      ret = calc_rev
+      @rev_changed = ret != _rev 
+      self._rev = ret
+    end
 
     after_save do
       _keys = [Oahu::Index::ALL_KEY]
@@ -79,7 +86,9 @@ module Oahu
 
     def self.sync
       Oahu.get(self.name.demodulize.pluralize.underscore, :limit => 0).map do |attrs|
-        create(attrs)
+        rec_id = attrs.delete "id"
+        rec = get(rec_id) || new(:id => rec_id)
+        rec.update_attributes(attrs)
       end
     end
 
@@ -92,11 +101,14 @@ module Oahu
     end
 
     def rev
-      respond_to?(:_rev) ? _rev : Digest::SHA1.hexdigest([self.class.name, id.to_s, updated_at.to_s].join(":"))
+      calc_rev
+    end
+
+    def calc_rev
+      Digest::SHA1.hexdigest([self.class.name, id.to_s, updated_at.to_s].join(":"))
     end
 
   end
-
 
   class Index
     ALL_KEY = "__all__"
@@ -139,9 +151,9 @@ module Oahu
   end
 
   class ProjectList < Model
-    
-    attribute :_rev, String
-    attribute :project_ids, Array
+   
+    # attribute :project_ids, Array
+    list :projects
     
     after_create :sync
 
@@ -151,7 +163,7 @@ module Oahu
         p = Project.find(i)
         __rev << p.rev unless p.nil?
       end
-      self._rev = Digest::MD5.hexdigest(__rev.flatten.join("-"))
+      self._rev = Digest::SHA1.hexdigest(__rev.flatten.join("-"))
       save
       self
     end
@@ -160,9 +172,6 @@ module Oahu
       ["name"]
     end
 
-    def projects
-      project_ids.map { |i| Project.find(i) }.compact  
-    end
   end
 
   class App < Model
@@ -195,6 +204,7 @@ module Oahu
 
   class Resource < Model
     attribute :project_id, String
+    attribute :paths, Hash
     
     def self.path id
       "projects/#{project_id}"
@@ -206,38 +216,42 @@ module Oahu
   end
 
   class ResourceList < Resource
+    def calc_rev
+      ret = [super] + items.map { |i| i.rev }
+      Digest::SHA1.hexdigest ret.join("-")
+    end
   end
 
   module Resources
 
     class Image < Resource
-      attribute :paths, Hash
     end
 
     class Video < Resource
-      attribute :paths, Hash
       attribute :encoding, String
     end
 
     class ImageList < ResourceList
-      attribute :image_ids, Array
-      def images
-        image_ids.map { |i| Image.get(i) }.compact
-      end
+      list :images, Oahu::Resources::Image
+      # attribute :image_ids, Array
+      # def images
+      #   image_ids.map { |i| Image.get(i) }.compact
+      # end
+      alias :items :images
     end
 
     class VideoList < ResourceList
-      attribute :video_ids, Array
-      def videos
-        video_ids.map { |i| v = Video.get(i); v unless v.encoding != "finished" }.compact
-      end
+      # attribute :video_ids, Array
+      list :videos, Oahu::Resources::Video
+      # def videos
+      #   video_ids.map { |i| v = Video.find(i); v unless v.encoding != "finished" }.compact
+      # end
+      alias :items :videos
     end
   end
 
   class Project < Model
     
-    attribute :_rev,              String
-    attribute :_type,             String
     attribute :countries,         Array
     attribute :credits,           Array
     attribute :genres,            Array
@@ -281,26 +295,29 @@ module Oahu
 
     def self.sync(filters={ :published => true })
       Oahu.log("Projects Sync start")
-      Oahu.get("projects", filters: filters, limit: 0).map { |attrs| create(attrs).sync }
+      Oahu.get("projects", filters: filters, limit: 0).map { |attrs| (find(attrs['id']) || create(attrs)).sync(attrs) }
     end
 
     # after_create :sync
 
-    def sync
-      __rev = [updated_at]
-      __rev << sync_list(:resources)
-      __rev << sync_list(:pub_accounts)
-      __rev << sync_list(:apps)
-      self._rev = Digest::MD5.hexdigest(__rev.flatten.join("-"))
-      save
+    def sync attrs={}
+      puts "Calling sync on Project: #{self.slug}, with rev: Stored rev: #{_rev}, Calc rev:((#{calc_rev}))"
+      attrs = Oahu.get("projects/#{id}") if attrs.blank?
+      sync_list(:resources)
+      sync_list(:pub_accounts)
+      sync_list(:apps)
+      puts "Before update: Stored rev: #{_rev}, Calc rev:((#{calc_rev}))"
+      update_attributes(attrs)
+      puts "After update: Stored rev: #{_rev}, Calc rev:((#{calc_rev}))"
       self
     end
- 
+
     def sync_list(what)
       rev = [what.to_s]
       _lists = {}
       Oahu.log("Project #{what} Sync start [#{id}]", :debug)
-      Oahu.get("projects/#{id}/#{what}", limit: 0).map do |attrs|
+      ret = Oahu.get("projects/#{id}/#{what}", limit: 0)
+      ret.sort_by { |r| r['_type'] }.map do |attrs|
         klass = "Oahu::#{attrs["_type"]}".constantize rescue nil
         klass = Oahu.const_get(what.to_s.singularize.camelize) unless klass.respond_to? :create
         list_name = klass.name.demodulize.pluralize.underscore.to_sym
@@ -308,11 +325,9 @@ module Oahu
           o = klass.create(attrs)
           _lists[list_name] ||= []
           _lists[list_name] << o
-          rev << o.rev
         end
       end
       _lists.map { |ln,ll| send("#{ln}=", ll) }
-      Digest::MD5.hexdigest rev.sort.join("-")
     end
 
     def default_video
