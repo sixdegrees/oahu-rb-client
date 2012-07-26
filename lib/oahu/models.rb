@@ -217,7 +217,7 @@ module Oahu
 
   class ResourceList < Resource
     def calc_rev
-      ret = [super] + items.map { |i| i.rev }
+      ret = [super] + items.map { |i| i.rev rescue nil }.compact
       Digest::SHA1.hexdigest ret.join("-")
     end
   end
