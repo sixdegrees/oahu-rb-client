@@ -108,6 +108,7 @@ module Oahu
       Digest::SHA1.hexdigest([self.class.name, id.to_s, updated_at.to_s].join(":"))
     end
 
+
   end
 
   class Index
@@ -229,6 +230,12 @@ module Oahu
 
     class Video < Resource
       attribute :encoding, String
+
+      def calc_rev
+        play_count = stats['play']['t'] rescue 0
+        [super, play_count].compact.join("-")
+      end
+      
     end
 
     class ImageList < ResourceList
