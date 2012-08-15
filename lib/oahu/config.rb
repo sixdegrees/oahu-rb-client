@@ -35,6 +35,8 @@ module Oahu
     DEFAULT_CACHE_STORE = nil
 
     DEFAULT_STORE_ADAPTER = [:memory, {}]
+
+    DEFAULT_PROXY = nil
     
     # The value sent in the 'User-Agent' header if none is set
     DEFAULT_USER_AGENT = "Oahu Ruby Gem #{Oahu::VERSION}"
@@ -43,6 +45,7 @@ module Oahu
 
     # An array of valid keys in the options hash when configuring a {Oahu::Client}
     VALID_OPTIONS_KEYS = [
+      :proxy,
       :adapter,
       :connection_options,
       :app_id,
@@ -85,6 +88,7 @@ module Oahu
     # Reset all configuration options to defaults
     def reset
       @domain                 = nil
+      self.proxy              = DEFAULT_PROXY
       self.logger             = DEFAULT_LOGGER
       self.adapter            = DEFAULT_ADAPTER
       self.connection_options = DEFAULT_CONNECTION_OPTIONS

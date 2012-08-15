@@ -19,6 +19,8 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'faraday',               '~> 0.7'
   gem.add_dependency 'faraday_middleware',    '~> 0.7'
   gem.add_dependency 'multi_json',            '~> 1.0'
+  gem.add_dependency 'multi_xml' #,            '~> 1.0'
+  gem.add_dependency 'mime-types'
   gem.add_dependency 'toystore',  ['>= 0.10', '< 1']
 
   # Development Dependencies
