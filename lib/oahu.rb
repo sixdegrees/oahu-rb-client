@@ -1,6 +1,7 @@
 require 'oahu/core_ext/hash'
 require 'oahu/client'
 require 'oahu/config'
+require 'oahu/account'
 
 module Oahu
   extend Config
