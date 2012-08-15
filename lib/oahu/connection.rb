@@ -22,8 +22,9 @@ module Oahu
         :timeout => 10,
         :open_timeout => 10
       }
+      auth = options[:auth] || ["consumer", consumer_id, client_id]
       @connection ||= Faraday.new(default_options.deep_merge(connection_options)) do |builder|
-        builder.use Oahu::Request::Auth, credentials
+        builder.use Oahu::Request::Auth, credentials, auth
         builder.use Faraday::Request::UrlEncoded 
         builder.use FaradayMiddleware::Caching, cache_store unless cache_store.nil?
         builder.use FaradayMiddleware::ParseJson
