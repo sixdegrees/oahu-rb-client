@@ -16,6 +16,11 @@ module Oahu
       request(:post, api_path(path), params, options)
     end
 
+    # Perform an HTTP PUT request
+    def put(path, params={}, options={})
+      request(:put, api_path(path), params, options)
+    end
+
   private
 
     def api_path path
@@ -27,15 +32,14 @@ module Oahu
     end
 
     # Perform an HTTP request
-    def request(method, path, params={}, options)
+    def request(method, path, params={}, options={})
       Oahu.log("#{method.upcase} #{path} - params: #{params.to_json}")
       response = connection(options).run_request(method, nil, nil, nil) do |request|
-        # request.options[:phoenix] = true if options[:phoenix]
         request.options[:raw] = true if options[:raw]
         case method.to_sym
         when :delete, :get
           request.url(path, params)
-        when :post
+        when :post, :put
           request.path = path
           request.body = params unless params.empty?
         end
