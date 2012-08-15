@@ -50,7 +50,8 @@ module Oahu
       params["key"].gsub!("${filename}", "/#{filename}")
       params["name"]          = filename
       params["file"]          = Faraday::UploadIO.new(source, content_type)
-      upload_connection.post("/", params).body
+      response = upload_connection.post("/", params)
+      response.body['PostResponse']
     end
 
     protected
