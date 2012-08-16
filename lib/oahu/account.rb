@@ -30,15 +30,13 @@ module Oahu
       opts.symbolize_keys!
       opts[:filename] ||= File.basename(source)
       res = upload source, filename: opts[:filename]
-      puts "Upload ok : #{res.inspect}"
-      puts "Event opts: #{opts.inspect}"
       event "add_image", opts
     end
 
     def upload source, opts={}
       return false unless File.exist?(source)
 
-      params = upload_policy['params'] rescue nil
+      params = upload_policy['params'].dup rescue nil
       return false unless params
 
       filename = opts[:filename]
@@ -47,9 +45,10 @@ module Oahu
 
       params["Content-Type"]  = content_type
       params["Filename"]      = filename
-      params["key"].gsub!("${filename}", "/#{filename}")
+      params["key"]           = params["key"].gsub("${filename}", "/#{filename}")
       params["name"]          = filename
       params["file"]          = Faraday::UploadIO.new(source, content_type)
+
       response = upload_connection.post("/", params)
       response.body['PostResponse']
     end
