@@ -78,10 +78,16 @@ module Oahu
 
     def self.find attrs
       if attrs.is_a?(Hash)
+      elsif attrs.is_a?(Array)
+        attrs.map { |a| find_one(a) }
       else
-        id = attrs.to_s
-        get(attrs) || create(Oahu.get(path(id)))
+        find_one(attrs)
       end
+    end
+
+    def self.find_one attrs
+      _id = attrs.to_s
+      get(attrs) || create(Oahu.get(path(id)))
     end
 
     def self.sync
